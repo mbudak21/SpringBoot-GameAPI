@@ -14,20 +14,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "coins", nullable = false)
     private Integer coins = 5000; // Default value
 
-    @Column(nullable = false)
+    @Column(name = "level", nullable = false)
     private Integer level = 1; // Default value
 
-    @Column(nullable = false)
+    @Column(name = "country", nullable = false)
     private String country; // Must be assigned during creation
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     // Getters and Setters
