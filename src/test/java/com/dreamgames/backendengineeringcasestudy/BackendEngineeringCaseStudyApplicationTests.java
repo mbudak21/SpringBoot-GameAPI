@@ -8,7 +8,7 @@ class BackendEngineeringCaseStudyApplicationTests {
 
     @Test
     void contextLoads() {
-
+        assert false;
     }
 
 }
