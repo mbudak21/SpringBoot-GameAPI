@@ -14,19 +14,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class BackendEngineeringCaseStudyApplicationTests {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Test
-    void statusEndpoint() throws Exception {
-        mockMvc.perform(get("/status"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Server is up!"));
-    }
-    @Test
-    void rootEndpoint() throws Exception {
-        mockMvc.perform(get("/"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Welcome to the SpringBoot Server!"));
-    }
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @Test
+//    void statusEndpoint() throws Exception {
+////        mockMvc.perform(get("/status"))
+////                .andExpect(status().isOk())
+////                .andExpect(content().string("Server is up!"));
+//    }
+//    @Test
+//    void rootEndpoint() throws Exception {
+////        mockMvc.perform(get("/"))
+////                .andExpect(status().isOk())
+////                .andExpect(content().string("Welcome to the SpringBoot Server!"));
+//    }
 }

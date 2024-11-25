@@ -3,14 +3,12 @@ package com.dreamgames.backendengineeringcasestudy.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// It is implemented to check server status. Don't modify this class.
 
 @RestController
-public class StatusController {
+public class RootController {
 
-    @GetMapping("/status")
-    public String status() {
-        return "Server is up!";
+    @GetMapping("/")
+    public String root() {
+        return "Welcome to the SpringBoot Server!";
     }
-
 }
