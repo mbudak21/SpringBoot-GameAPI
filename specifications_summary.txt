@@ -1,0 +1,30 @@
+User:
+	DB
+	ID: primary key
+	coins: 5000, after each level receive 25
+	level: 1
+	country: [].random()
+	coins + level + country => user progress
+
+	Functions
+	Server: CreateUserRequest() => new User();
+	Client: UpdateLevelRequest(): increment level, add coins => (user progress)
+
+Tournament:
+	DB
+	ID: pk
+	10x Users, two teams of 5 users all from different countries, users must also be level 20 with 1000coins
+	10x User points: corresponding tournament points of all users, they increase when a user passes a level
+	10x User claim: Boolean val, if reward wasn't claimed user can't enter new tournament
+
+	Funcs
+	EnterTournamentRequest
+	ClaimRewardRequest
+	GetGroupRankRequest
+	GetGroupLeaderboardRequest
+	GetCountryLeaderboardRequest
+	
+
+	
+
+	
