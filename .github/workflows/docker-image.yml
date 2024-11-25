@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "mbudak21-CI"]
   pull_request:
     branches: [ "main" ]
 
