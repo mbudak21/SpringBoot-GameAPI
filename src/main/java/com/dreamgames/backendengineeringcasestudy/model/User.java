@@ -1,5 +1,7 @@
 package com.dreamgames.backendengineeringcasestudy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,22 +14,25 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
-
-    @Column(name = "coins", nullable = false)
-    private Integer coins = 5000; // Default value
 
     @Column(name = "level", nullable = false)
     private Integer level = 1; // Default value
+
+    @Column(name = "coins", nullable = false)
+    private Integer coins = 5000; // Default value
 
     @Column(name = "country", nullable = false)
     private String country; // Must be assigned during creation
 
     @CreationTimestamp
+    @JsonIgnore
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @JsonIgnore
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -41,20 +46,20 @@ public class User {
         this.id = id;
     }
 
-    public Integer getCoins() {
-        return coins;
-    }
-
-    public void setCoins(Integer coins) {
-        this.coins = coins;
-    }
-
     public Integer getLevel() {
         return level;
     }
 
     public void setLevel(Integer level) {
         this.level = level;
+    }
+
+    public Integer getCoins() {
+        return coins;
+    }
+
+    public void setCoins(Integer coins) {
+        this.coins = coins;
     }
 
     public String getCountry() {
