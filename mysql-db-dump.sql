@@ -7,9 +7,9 @@ CREATE TABLE if not exists users (
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (coins, level, country)
-VALUES
-    (5000, 1, 'United States'),
-    (5000, 1, 'United Kingdom'),
-    (5000, 1, 'France'),
-    (5000, 1, 'Germany');
+# INSERT INTO users (coins, level, country)
+# VALUES
+#     (5000, 1, 'United States'),
+#     (5000, 1, 'United Kingdom'),
+#     (5000, 1, 'France'),
+#     (5000, 1, 'Germany');
