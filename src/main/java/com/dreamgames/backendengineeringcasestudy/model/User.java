@@ -1,7 +1,6 @@
 package com.dreamgames.backendengineeringcasestudy.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -23,8 +22,9 @@ public class User {
     @Column(name = "coins", nullable = false)
     private Integer coins = 5000; // Default value
 
-    @Column(name = "country", nullable = false)
-    private String country; // Must be assigned during creation
+    @ManyToOne
+    @JoinColumn(name = "country_code", nullable = false)
+    private Country country; // Using the object itself, instead of string "country_code"
 
     @CreationTimestamp
     @JsonIgnore
@@ -62,11 +62,11 @@ public class User {
         this.coins = coins;
     }
 
-    public String getCountry() {
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(Country country) {
         this.country = country;
     }
 
