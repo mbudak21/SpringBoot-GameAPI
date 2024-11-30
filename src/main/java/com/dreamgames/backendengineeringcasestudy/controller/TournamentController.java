@@ -4,6 +4,8 @@ import com.dreamgames.backendengineeringcasestudy.model.Tournament;
 import com.dreamgames.backendengineeringcasestudy.model.User;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
 import com.dreamgames.backendengineeringcasestudy.service.TournamentService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,18 @@ public class TournamentController {
     public List<Tournament> getAllTournaments() {
         return tournamentService.getAllTournaments();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
+        Tournament tournament = tournamentService.getTournamentById(id);
+        return ResponseEntity.ok(tournament);
+    }
+
+//    @PostMapping("/create")
+//    public ResponseEntity<Tournament> createTournament(@RequestBody Tournament tournament) {
+//        Tournament createdTournament = tournamentService.createTournament(tournament);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdTournament);
+//    }
 
 
 
