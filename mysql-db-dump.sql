@@ -15,7 +15,6 @@ INSERT IGNORE INTO countries VALUES
     ('FRA', 'France'),
     ('GER', 'Germany');
 
-
 CREATE TABLE if not exists users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(20) NOT NULL,
@@ -29,33 +28,12 @@ CREATE TABLE if not exists users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- 2 users from each country,
-INSERT INTO users (username, country_code) VALUES
-    ('t1', 'TR'),
-    ('t2', 'TR'),
-    ('t3', 'TR'),
-    ('ahmet', 'TR'),
-    ('john', 'UK'),
-    ('mike', 'US'),
-    ('pierre', 'FRA'),
-    ('hans', 'GER'),
-    ('mehmet', 'TR'),
-    ('george', 'UK'),
-    ('kevin', 'US'),
-    ('luc', 'FRA'),
-    ('karl', 'GER');
-
-
 CREATE TABLE if not exists tournaments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     description VARCHAR(500)
 );
-
-INSERT INTO tournaments (tournaments.start_time, tournaments.end_time, tournaments.description) VALUES
-    ('2000-11-30 10:00:00', '2000-12-01 18:00:00', 'cool tournament1'),
-    ('2024-11-29 00:00:00', '2024-11-29 20:00:00', 'cool active tournament');
 
 CREATE TABLE IF NOT EXISTS tournament_bracket ( -- Instance of a tournament
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -69,14 +47,13 @@ CREATE TABLE IF NOT EXISTS tournament_bracket ( -- Instance of a tournament
 
 -- 1-10 relationship between users and tournaments
 CREATE TABLE IF NOT EXISTS tournament_participants (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tournament_bracket_id BIGINT UNSIGNED NOT NULL,
-    user_id BIGINT UNSIGNED NOT NULL, -- Match the type of `id` in `users`
-    score INT DEFAULT 0 NOT NULL,
-    team INT DEFAULT 0 NOT NULL,
+    user_id BIGINT UNSIGNED NULL, -- Match the type of `id` in `users`
+    score INT NOT NULL DEFAULT 0,
+    team INT NOT NULL DEFAULT 0, -- Could remove default value here
     reward_claimed BOOLEAN DEFAULT FALSE NOT NULL,
     FOREIGN KEY (tournament_bracket_id) REFERENCES tournament_bracket(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    UNIQUE (tournament_bracket_id, user_id),
-    PRIMARY KEY (tournament_bracket_id, user_id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE (tournament_bracket_id, user_id)
 );
-

@@ -9,11 +9,14 @@ import jakarta.persistence.*;
 public class TournamentParticipant {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
     @ManyToOne //(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_bracket_id", nullable = false)
     private TournamentBracket tournamentBracket;
 
-    @Id
     @ManyToOne //(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

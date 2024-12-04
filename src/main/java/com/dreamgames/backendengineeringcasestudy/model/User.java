@@ -1,6 +1,7 @@
 package com.dreamgames.backendengineeringcasestudy.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "users")
 public class User {
 
@@ -20,10 +22,10 @@ public class User {
     private String username;
 
     @Column(name = "level", nullable = false)
-    private Integer level = 1; // Default value
+    private Integer level; // Default value
 
     @Column(name = "coins", nullable = false)
-    private Integer coins = 5000; // Default value
+    private Integer coins; // Default value
 
     @ManyToOne
     @JoinColumn(name = "country_code", nullable = false)
@@ -40,7 +42,6 @@ public class User {
     private LocalDateTime updatedAt;
 
     // Getters and Setters
-
     public Long getId() {
         return id;
     }
@@ -88,4 +89,15 @@ public class User {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "User{id=" + id +
+                    ", username=" + username +
+                    ", level=" + level +
+                    ", coins=" + coins +
+                    ", country=" + country +
+                "}";
+    }
+
 }

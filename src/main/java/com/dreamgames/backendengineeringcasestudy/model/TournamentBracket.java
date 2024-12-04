@@ -1,10 +1,12 @@
 package com.dreamgames.backendengineeringcasestudy.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.beans.ConstructorProperties;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,6 +19,7 @@ public class TournamentBracket {
 
     @ManyToOne //(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_id", nullable = false)
+    @JsonIgnore
     private Tournament tournament;
 
     @Column(name = "max_teams", nullable = false)

@@ -1,6 +1,8 @@
 package com.dreamgames.backendengineeringcasestudy.service;
 
 import com.dreamgames.backendengineeringcasestudy.model.Country;
+import com.dreamgames.backendengineeringcasestudy.model.TournamentBracket;
+import com.dreamgames.backendengineeringcasestudy.model.TournamentParticipant;
 import com.dreamgames.backendengineeringcasestudy.model.User;
 import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -19,10 +21,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CountryService countryService;
+    private final TournamentService tournamentService;
+    private final TournamentBracketService tournamentBracketService;
 
-    public UserService(UserRepository userRepository, CountryService countryService) {
+    public UserService(UserRepository userRepository, CountryService countryService, TournamentBracketService tournamentBracketService, TournamentService tournamentService) {
         this.userRepository = userRepository;
         this.countryService = countryService;
+        this.tournamentService = tournamentService;
+        this.tournamentBracketService = tournamentBracketService;
     }
 
     @Transactional
@@ -52,14 +58,25 @@ public class UserService {
         user.setLevel(user.getLevel() + 1);
         user.setCoins(user.getCoins() + LEVEL_UP_BONUS);
 
+        // Get all the tournament brackets the user is a participant of
+        List<TournamentParticipant> activeParticipations = tournamentService.getActiveParticipations(user.getId());
+        for (TournamentParticipant participation : activeParticipations) {
+            participation.setScore(participation.getScore() + 1);
+        }
         return userRepository.save(user);
     }
 
+    @Transactional
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User getUserById(Long userId) {
         return userRepository.getReferenceById(userId);
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }
