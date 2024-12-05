@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.HashMap;
 import java.util.Map;
 
-@SpringBootApplication
+@SpringBootApplication()
 public class BackendEngineeringCaseStudyApplication {
 
     public static void main(String[] args) throws InterruptedException {

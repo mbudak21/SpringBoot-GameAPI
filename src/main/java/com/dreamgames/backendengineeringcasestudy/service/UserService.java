@@ -6,6 +6,8 @@ import com.dreamgames.backendengineeringcasestudy.model.TournamentParticipant;
 import com.dreamgames.backendengineeringcasestudy.model.User;
 import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,12 +25,19 @@ public class UserService {
     private final CountryService countryService;
     private final TournamentService tournamentService;
     private final TournamentBracketService tournamentBracketService;
+    private final Logger logger;
+
 
     public UserService(UserRepository userRepository, CountryService countryService, TournamentBracketService tournamentBracketService, TournamentService tournamentService) {
         this.userRepository = userRepository;
         this.countryService = countryService;
         this.tournamentService = tournamentService;
         this.tournamentBracketService = tournamentBracketService;
+        this.logger = getLogger();
+    }
+
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(Logger.class);
     }
 
     @Transactional
@@ -41,6 +50,11 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Country generation failed");
         }
 
+        logger.info("Trying to create a new user with the following properties: {username: " + username +
+                " coins: " + DEFAULT_COINS +
+                " level: " + DEFAULT_LEVEL +
+                " country:" + randomCountry.getName() +
+                "}");
         User user = new User();
         user.setUsername(username);
         user.setCoins(DEFAULT_COINS);
