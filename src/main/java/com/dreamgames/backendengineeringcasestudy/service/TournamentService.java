@@ -88,7 +88,7 @@ public class TournamentService {
         logger.info("Found {} empty brackets for tournamentID: {}", brackets.size(), tournamentId);
 
         for (TournamentBracket bracket : brackets) {
-            if (tournamentBracketRepository.isUserInBracket(user.getId())) {
+            if (tournamentBracketRepository.isUserInBracket(bracket.getId(), user.getId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User already in this tournament");
             }
             List<TournamentParticipant> participantList = tournamentParticipantRepository.findByTournamentBracket(bracket);
@@ -99,11 +99,13 @@ public class TournamentService {
                 throw new IllegalStateException("Participant list size does not match user list size, this should never happen.");
             }
 
-            Map<Integer, Integer> validTeamSlots = createMapping(bracket.getMaxTeams(), bracket.getParticipantsPerTeam());
+            Map<Integer, Integer> validTeamSlots = createMapping(bracket.getMaxTeams(), bracket.getParticipantsPerTeam()); // {1:5, 2:5}
+            logger.info("Valid Team Slots: {}", validTeamSlots);
 
             for (int i = 0; i < participantList.size(); i++) {
                 Integer participantTeam = participantList.get(i).getTeam();
-                validTeamSlots.put(participantTeam, validTeamSlots.get(participantTeam) - 1);
+                logger.info("team: {}", participantTeam);
+                validTeamSlots.put(participantTeam, validTeamSlots.getOrDefault(participantTeam, 0) - 1);
                 if (user.getCountry() == userList.get(participantTeam).getCountry()) {
                     validTeamSlots.put(participantTeam, -1); // Country constraint violated, set to -1
                     logger.info("User can't join team {}, due to UserID being from {}", participantTeam, user.getCountry());
@@ -113,8 +115,9 @@ public class TournamentService {
             // Check any joinable team
             for (int i = 0; i < validTeamSlots.size(); i++) {
                 if (validTeamSlots.get(i) > 0){
+                    logger.info("Found a joinable team, enrolling the user.");
                     // Found empty and valid team, enroll the user
-                    //logger.info("User with ID {} found an empty bracket in tournament with ID {} on bracketID {}", userId, tournamentId, bracket.getId());
+                    logger.info("User with ID {} found an empty bracket in tournament with ID {} on bracketID {}", userId, tournamentId, bracket.getId());
                     TournamentParticipant newParticipant = new TournamentParticipant();
                     newParticipant.setTournamentBracket(brackets.get(i));
                     newParticipant.setTeam(validTeamSlots.get(i));

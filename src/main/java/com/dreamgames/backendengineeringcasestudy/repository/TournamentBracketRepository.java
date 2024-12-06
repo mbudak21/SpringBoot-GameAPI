@@ -67,5 +67,5 @@ public interface TournamentBracketRepository extends JpaRepository<TournamentBra
               AND tp.user.id = :userID
             """
     )
-    Boolean isUserInBracket(@Param("userID") Long userID);
+    Boolean isUserInBracket(@Param("bracketID") Long bracketID, @Param("userID") Long userID);
 }
