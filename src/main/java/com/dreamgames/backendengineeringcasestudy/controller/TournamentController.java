@@ -19,12 +19,13 @@ import java.util.List;
 public class TournamentController {
     private final TournamentService tournamentService;
     private final TournamentBracketService tournamentBracketService;
+
     public TournamentController(TournamentService tournamentService, TournamentBracketService tournamentBracketService) {
         this.tournamentService = tournamentService;
         this.tournamentBracketService = tournamentBracketService;
     }
 
-    @GetMapping("all")
+    @GetMapping
     public List<Tournament> getAllTournaments(@RequestParam(required = false) Boolean isActive) {
         return tournamentService.getAllTournaments(isActive);
     }
@@ -48,6 +49,7 @@ public class TournamentController {
         TournamentBracket bracket = tournamentParticipant.getTournamentBracket();
         return ResponseEntity.ok(tournamentBracketService.getGroupLeaderboardByBracket(bracket));
     }
+
     @GetMapping("/{tournamentId}/brackets")
     public ResponseEntity<?> getBrackets(@PathVariable Long tournamentId, @RequestParam(required = false) Integer bracket_index) {
         if (bracket_index == null) { // Return all brackets in a compact format
@@ -57,12 +59,11 @@ public class TournamentController {
                         .body("No brackets found for tournament ID: " + tournamentId);
             }
             return ResponseEntity.ok(brackets);
-        }
-        else { // Return the DTO of the bracket
+        } else { // Return the DTO of the bracket
             return ResponseEntity.ok(tournamentService.getTournamentBracketDTO(tournamentId, bracket_index));
         }
     }
-
+}
 
 
 
@@ -75,4 +76,4 @@ public class TournamentController {
 //        return ResponseEntity.ok(updatedUser);
 //    }
 
-}
+

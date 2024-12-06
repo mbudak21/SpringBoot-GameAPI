@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RootController {
 
-    @GetMapping("/")
+    @GetMapping
     public String root() {
         return "Welcome to the SpringBoot Server!";
     }
