@@ -1,0 +1,784 @@
+{
+	"info": {
+		"_postman_id": "be5d7c15-20a1-40b6-bd54-2d87e46ec3e8",
+		"name": "backend-engineering-study",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39618761"
+	},
+	"item": [
+		{
+			"name": "Endpoints",
+			"item": [
+				{
+					"name": "StatusController",
+					"item": [
+						{
+							"name": "Check Server Status",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}status",
+									"host": [
+										"{{base_url}}status"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "RootController",
+					"item": [
+						{
+							"name": "Check Root",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}",
+									"host": [
+										"{{base_url}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "CountryController",
+					"item": [
+						{
+							"name": "getCountries",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/countries",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"countries"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "UserController",
+					"item": [
+						{
+							"name": "Get All Users",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response contains a list of users\", function () {",
+											"    const response = pm.response.json();",
+											"    pm.expect(response).to.be.an('array');",
+											"    pm.expect(response.length).to.be.greaterThan(0);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/users",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"users"
+									]
+								},
+								"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+							},
+							"response": []
+						},
+						{
+							"name": "Create User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful POST request\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response contains user ID and username\", function () {",
+											"    const response = pm.response.json();",
+											"    pm.expect(response).to.have.property('id');",
+											"    pm.expect(response.username).to.equal('JohnDoe2');",
+											"});",
+											"",
+											"// Save the user ID for future requests",
+											"const response = pm.response.json();",
+											"pm.environment.set(\"userId\", response.id);",
+											"pm.environment.set(\"userName\", response.username);",
+											"pm.environment.set(\"userLevel\", response.level);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}api/users/create?username=JohnDoe24",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"users",
+										"create"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "JohnDoe24"
+										}
+									]
+								},
+								"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+							},
+							"response": []
+						},
+						{
+							"name": "Get User By ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains user details\", function () {\r",
+											"    const response = pm.response.json();\r",
+											"    pm.expect(response.id).to.equal(parseInt(pm.environment.get(\"userId\")));\r",
+											"    pm.expect(response).to.have.property('username');\r",
+											"    pm.expect(response).to.have.property('level');\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"packages": {},
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/users/{{id}}",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"users",
+										"{{id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Level",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Correct user is returned\", function () {",
+											"    const response = pm.response.json();",
+											"    pm.expect(response.id).to.equal(parseInt(pm.environment.get(\"userId\")));",
+											"    pm.expect(response.username).to.equal(pm.environment.get(\"userName\"));",
+											"});",
+											"",
+											"pm.test(\"User's level has increased by 1\", function () {",
+											"    const response = pm.response.json();",
+											"    const previousLevel = parseInt(pm.environment.get(\"userLevel\"));",
+											"    pm.expect(response.level).to.equal(previousLevel + 1);",
+											"",
+											"    // Update the level in the environment for further tests",
+											"    pm.environment.set(\"userLevel\", response.level);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}api/users/{{id}}/level",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"users",
+										"{{id}}",
+										"level"
+									]
+								},
+								"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User By ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful DELETE request\", function () {",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}api/users/2",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"users",
+										"2"
+									]
+								},
+								"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "TournamentController",
+					"item": [
+						{
+							"name": "Get All Tournaments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Active Tournaments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments?isActive=true",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments"
+									],
+									"query": [
+										{
+											"key": "isActive",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Inactive Tournaments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments?isActive=false",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments"
+									],
+									"query": [
+										{
+											"key": "isActive",
+											"value": "false"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Tournament By ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments/{{tournament_id}}",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"{{tournament_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create New Tournament",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"startTime\": \"2024-12-01T10:00:00\",\r\n    \"endTime\": \"2044-12-01T18:00:00\",\r\n    \"description\": \"Winter Championship3\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}api/tournaments/create",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"create"
+									],
+									"query": [
+										{
+											"key": "description",
+											"value": "test",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Enter Tournament",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments/{{tournament_id}}/enter?userId=2",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"{{tournament_id}}",
+										"enter"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get i'th Bracket of Tournament",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments/{{tournament_id}}/brackets?bracket_index=1",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"{{tournament_id}}",
+										"brackets"
+									],
+									"query": [
+										{
+											"key": "bracket_index",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Brackets of a Tournament",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments/{{tournament_id}}/brackets",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"{{tournament_id}}",
+										"brackets"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "1000 Users",
+			"item": [
+				{
+					"name": "Get All Current Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const users = pm.response.json();\r",
+									"pm.environment.set(\"previousUserCount\", users.length);\r",
+									"console.log(`Previous user count: ${users.length}`);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/users",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create 1000 New Users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Number of users to create\r",
+									"const totalUsers = 1000;\r",
+									"\r",
+									"// Get the current iteration (if not set, start from 0)\r",
+									"let currentIteration = pm.environment.get(\"currentIteration\") || 0;\r",
+									"\r",
+									"// Stop if all users are created\r",
+									"if (currentIteration >= totalUsers) {\r",
+									"    console.log(\"All users have been created.\");\r",
+									"    pm.environment.set(\"stopRequest\", true); // Add a flag to stop further requests\r",
+									"} else {\r",
+									"    // Increment and set the username\r",
+									"    const username = `user${++currentIteration}`;\r",
+									"    pm.environment.set(\"username\", username);\r",
+									"    pm.environment.set(\"currentIteration\", currentIteration);\r",
+									"    console.log(`Creating user: ${username}`);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate response\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"pm.test(\"Response contains user ID and username\", function () {\r",
+									"    pm.expect(response).to.have.property('id');\r",
+									"    pm.expect(response.username).to.include('user');\r",
+									"});\r",
+									"\r",
+									"// Save the created user IDs for deletion later\r",
+									"const createdUsers = pm.environment.get(\"createdUsers\") \r",
+									"    ? JSON.parse(pm.environment.get(\"createdUsers\")) \r",
+									"    : [];\r",
+									"createdUsers.push(response.id);\r",
+									"pm.environment.set(\"createdUsers\", JSON.stringify(createdUsers));\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/users/create?username={{username}}",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"users",
+								"create"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Creation of 1000 new Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const users = pm.response.json();\r",
+									"const previousUserCount = parseInt(pm.environment.get(\"previousUserCount\"));\r",
+									"pm.test(\"Total user count is correct\", function () {\r",
+									"    pm.expect(users.length).to.equal(previousUserCount + 1000);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/users",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete All 1000 New Users",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const createdUsers = JSON.parse(pm.environment.get(\"createdUsers\"));\r",
+									"let currentDeleteIndex = pm.environment.get(\"currentDeleteIndex\") || 0;\r",
+									"\r",
+									"if (currentDeleteIndex >= createdUsers.length) {\r",
+									"    console.log(\"All users have been deleted\");\r",
+									"    postman.setNextRequest(null); // Stop further requests\r",
+									"} else {\r",
+									"    const userId = createdUsers[currentDeleteIndex];\r",
+									"    pm.environment.set(\"userId\", userId);\r",
+									"    pm.environment.set(\"currentDeleteIndex\", ++currentDeleteIndex);\r",
+									"    console.log(`Deleting user: ${userId}`);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									"\r",
+									"const currentDeleteIndex = pm.environment.get(\"currentDeleteIndex\");\r",
+									"const createdUsers = JSON.parse(pm.environment.get(\"createdUsers\"));\r",
+									"if (currentDeleteIndex < createdUsers.length) {\r",
+									"    postman.setNextRequest(\"Delete All 1000 New Users\");\r",
+									"} else {\r",
+									"    console.log(\"Completed deleting all users.\");\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}api/users/{{userId}}",
+							"host": [
+								"{{base_url}}api"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "localhost:8080/"
+		},
+		{
+			"key": "tournament_id",
+			"value": "1",
+			"type": "default"
+		}
+	]
+}
