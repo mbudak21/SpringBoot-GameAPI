@@ -59,6 +59,13 @@ public interface TournamentBracketRepository extends JpaRepository<TournamentBra
     )
     Boolean isBracketBeingPlayed(@Param("bracketID") Long bracketID);
 
-
-    //boolean canJoin(TournamentBracket bracket, User user);
+    @Query(
+            """
+            SELECT CASE WHEN COUNT(tp.id) > 0 THEN true ELSE false END
+            FROM TournamentParticipant tp
+            WHERE tp.tournamentBracket.id = :bracketID
+              AND tp.user.id = :userID
+            """
+    )
+    Boolean isUserInBracket(@Param("userID") Long userID);
 }

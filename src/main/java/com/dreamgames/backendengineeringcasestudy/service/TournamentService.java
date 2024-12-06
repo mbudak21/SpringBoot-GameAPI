@@ -69,22 +69,28 @@ public class TournamentService {
 
     @Transactional
     public TournamentParticipant joinTournament(Long tournamentId, Long userId) {
-        logger.info("UserID: {} is joining TournamentID: {}", userId, tournamentId);
+        logger.info("Received request, UserID: {} is trying to join TournamentID: {}", userId, tournamentId);
         Tournament tournament = getTournamentById(tournamentId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         if (user.getCoins() < MINIMUM_COINS_REQUIRED) {
-            throw new IllegalArgumentException("User does not have enough coins to join a tournament. User currently has " + user.getCoins() + " coins.");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Insufficient coins. User has " + user.getCoins() + " coins.");
         }
         if (user.getLevel() < MINIMUM_LEVEL_REQUIRED) {
-            throw new IllegalArgumentException("User must be level 20 or above to join a tournament. User is currently level " + user.getLevel());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User must be level " + MINIMUM_LEVEL_REQUIRED + " or above to join a tournament. User is currently level " + user.getLevel());
+        }
+        if (!tournament.getIsActive()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This tournament is already over");
         }
 
         List<TournamentBracket> brackets = tournamentBracketRepository.getEmptyBrackets(tournament);
         logger.info("Found {} empty brackets for tournamentID: {}", brackets.size(), tournamentId);
 
         for (TournamentBracket bracket : brackets) {
+            if (tournamentBracketRepository.isUserInBracket(user.getId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User already in this tournament");
+            }
             List<TournamentParticipant> participantList = tournamentParticipantRepository.findByTournamentBracket(bracket);
             List<User> userList = participantList.stream().map(TournamentParticipant::getUser).toList();
 
@@ -108,6 +114,7 @@ public class TournamentService {
             for (int i = 0; i < validTeamSlots.size(); i++) {
                 if (validTeamSlots.get(i) > 0){
                     // Found empty and valid team, enroll the user
+                    //logger.info("User with ID {} found an empty bracket in tournament with ID {} on bracketID {}", userId, tournamentId, bracket.getId());
                     TournamentParticipant newParticipant = new TournamentParticipant();
                     newParticipant.setTournamentBracket(brackets.get(i));
                     newParticipant.setTeam(validTeamSlots.get(i));
