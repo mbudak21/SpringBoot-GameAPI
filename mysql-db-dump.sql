@@ -17,7 +17,7 @@ INSERT IGNORE INTO countries VALUES
 
 CREATE TABLE if not exists users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(20) NOT NULL,
+    username VARCHAR(25) NOT NULL,
     UNIQUE(username),
     coins INT DEFAULT 5000 NOT NULL CHECK (coins >= 0),
     level INT DEFAULT 1 NOT NULL CHECK (level >= 1),
