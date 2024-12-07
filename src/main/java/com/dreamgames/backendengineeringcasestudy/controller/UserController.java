@@ -42,7 +42,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PatchMapping("/{id}/level")
+    @PatchMapping("/{id}/levelUp")
     public ResponseEntity<User> updateLevel(@PathVariable Long id) {
         User updatedUser = userService.updateLevel(id);
         return ResponseEntity.ok(updatedUser);
