@@ -1,26 +1,16 @@
-import com.dreamgames.backendengineeringcasestudy.model.Tournament;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
-import com.dreamgames.backendengineeringcasestudy.service.TournamentBracketService;
-import com.dreamgames.backendengineeringcasestudy.service.TournamentService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
+import com.dreamgames.backendengineeringcasestudy.util.TestUtils;
 import org.junit.jupiter.api.*;
-import com.dreamgames.backendengineeringcasestudy.model.User;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -29,11 +19,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = com.dreamgames.backendengineeringcasestudy.BackendEngineeringCaseStudyApplication.class)
 @AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
 public class TournamentControllerTest {
 
-    private String getTournamentEndpoint = "/api/tournaments";
-    private String createTournamentEndpoint = "/api/tournaments/create";
+    private final String getTournamentEndpoint = "/api/tournaments";
+    private final String createTournamentEndpoint = "/api/tournaments/create";
+    private final String joinTournamentEndpoint = "/enter";
 
 
     @Autowired
@@ -42,31 +32,76 @@ public class TournamentControllerTest {
     @Autowired
     private TournamentRepository tournamentRepository;
 
+    @Autowired
+    private TestUtils testUtils;
+    @Autowired
+    private UserRepository userRepository;
+
 
     @BeforeEach
-    void ensureClearDatabase() throws Exception {
+    void setupTestData() throws Exception {
+        // Make sure there is no other data
         mockMvc.perform(get(getTournamentEndpoint))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
+
+        testUtils.createTournament(mockMvc, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1), "Already finished");
+        testUtils.createTournament(mockMvc, LocalDateTime.now(), LocalDateTime.now().plusDays(1), "Currently open to join");
+        testUtils.createTournament(mockMvc, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), "Will be open to join in the future");
+
+        for (int i = 0; i < 100; i++) {
+            testUtils.createUser(mockMvc, "testuser" + i);
+        }
+    }
+
+    @AfterEach
+    void clearDatabase() throws Exception {
+        // Delete all the entry's in all the databases
+        tournamentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
-    void testCreateAndFetchTournament() throws Exception {
-        // 1. Create a tournament using POST
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
-//        String startTime = LocalDateTime.now().plusDays(1).toString().format(String.valueOf(formatter));
-//        String endTime = LocalDateTime.now().plusDays(2).toString().format(String.valueOf(formatter));
+    void testDataInitialization() throws Exception {
+        mockMvc.perform(get(getTournamentEndpoint))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3)); // Check number of tournaments
+    }
+
+    @Test
+    void testGetTournamentByID() throws Exception {
+        // Step 1: Create a new tournament
+        LocalDateTime startTime = LocalDateTime.now().minusDays(1);
+        LocalDateTime endTime = LocalDateTime.now().plusDays(2);
+        String description = "testGetTournamentByID Tournament";
+        Long id = testUtils.createTournament(mockMvc, startTime, endTime, description);
+
+        // Step 2: Retrieve the tournament by its ID using GET
+        mockMvc.perform(get(getTournamentEndpoint + "/" + id))
+                .andExpect(status().isOk()) // Ensure the request is successful
+                .andExpect(jsonPath("$.id").value(id)) // Validate the ID
+                .andExpect(jsonPath("$.startTime").value(startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")))) // Validate startTime
+                .andExpect(jsonPath("$.endTime").value(endTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")))) // Validate endTime
+                .andExpect(jsonPath("$.description").value(description)) // Validate description
+                .andExpect(jsonPath("$.isActive").value((startTime.isEqual(LocalDateTime.now()) || startTime.isBefore(LocalDateTime.now())) && endTime.isAfter(LocalDateTime.now())));
+    }
+
+    @Test
+    void testJoinTournament() throws Exception {
+
+    }
+//    @Test
+//    void testCreateAndFetchTournament() throws Exception {
+//        // 1. Create a tournament using POST
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+//        String startTime = LocalDateTime.now().plusDays(1).format(formatter);
+//        String endTime = LocalDateTime.now().plusDays(2).format(formatter);
 //        String description = "Integration Test Tournament";
+//        // NOTE: datetime supplied is of the format :  2024-12-08T17:09:38.3407076
+//        // while the datetime gotten is of the format: 2024-12-08T17:09:38
+//        // Not sure why these match, they don't match if .format is not applied.
 //
-//        MvcResult createResult = mockMvc.perform(post("/api/tournaments/create")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"startTime\":\"" + startTime + "\",\"endTime\":\"" + endTime + "\",\"description\":\"" + description + "\"}"))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.id").exists())
-//                .andExpect(jsonPath("$.startTime").value(startTime))
-//                .andExpect(jsonPath("$.endTime").value(endTime))
-//                .andExpect(jsonPath("$.description").value(description))
-//                .andReturn();
+//
 //
 //        // Extract the created tournament ID
 //        String responseContent = createResult.getResponse().getContentAsString();
@@ -85,7 +120,14 @@ public class TournamentControllerTest {
 //        Assertions.assertEquals(description, tournament.getDescription());
 //        Assertions.assertEquals(LocalDateTime.parse(startTime), tournament.getStartTime());
 //        Assertions.assertEquals(LocalDateTime.parse(endTime), tournament.getEndTime());
-    }
+//
+//        // 4. Delete the tournament using the repository, because there are no endpoints for tournament deletion
+//        tournamentRepository.deleteById(tournamentId);
+//        Optional<Tournament> tournament1 = tournamentRepository.findById(tournamentId);
+//        Assertions.assertFalse(tournament1.isPresent());
+//    }
+
+
 
 //    @Test
 //    void testGetTournamentById() throws Exception {
