@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,6 +18,7 @@ public class UserControllerTest {
 
     private final String getUsersEndpoint = "/api/users";
     private final String createUserEndpoint = "/api/users/create";
+    private final String UserLevelUpEndpoint = "/levelUp";
 
 
     @Autowired
@@ -43,6 +46,35 @@ public class UserControllerTest {
         mockMvc.perform(get(getUsersEndpoint))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3));
+    }
+    
+    @Test
+    void testCreateDuplicateUser() throws Exception {
+        String createUserUrl = createUserEndpoint + "?username=" + "TestUser1";
+        MvcResult createUserResult = mockMvc.perform(post(createUserUrl))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Username already exists"))
+                .andReturn();
+    }
+
+    @Test
+    void testUserLevelUp() throws Exception {
+        Long uid = testUtils.createUser(mockMvc, "LevelUpTestUser");
+        for (int i = 1; i <= 30; i++) {
+            mockMvc.perform(patch(getUsersEndpoint + "/" + uid + UserLevelUpEndpoint))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(uid))
+                    .andExpect(jsonPath("$.username").value("LevelUpTestUser"))
+                    .andExpect(jsonPath("$.level").value(i+1))
+                    .andExpect(jsonPath("$.coins").value(5000+25*i));
+        }
+    }
+
+    @Test
+    void testNonexistentUserLevelUp() throws Exception {
+        mockMvc.perform(patch(getUsersEndpoint + "/" + Integer.MAX_VALUE + UserLevelUpEndpoint))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value(containsString("User with ID " + Integer.MAX_VALUE + " not found")));
     }
 
     @AfterEach

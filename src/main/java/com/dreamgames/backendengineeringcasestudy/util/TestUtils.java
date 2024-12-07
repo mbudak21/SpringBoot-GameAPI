@@ -1,5 +1,8 @@
 package com.dreamgames.backendengineeringcasestudy.util;
 
+import com.dreamgames.backendengineeringcasestudy.dto.GroupLeaderboardDTO;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
@@ -8,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -15,8 +19,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @Component
 public class TestUtils {
 
-    private final String createUserEndpoint = "/api/users/create";
-    private final String createTournamentEndpoint = "/api/tournaments/create";
+    private final String tournamentEndpoint = "/api/tournaments";
+    private final String userEndpoint = "/api/users";
+    private final String createUserEndpoint = userEndpoint + "/create";
+    private final String createTournamentEndpoint = tournamentEndpoint + "/create";
+    private final String joinTournamentEndpoint = "/enter";
 
     public Long createUser(MockMvc mockMvc, String username) throws Exception {
         String createUserUrl = createUserEndpoint + "?username=" + username;
@@ -49,4 +56,22 @@ public class TestUtils {
         String responseContent = createResult.getResponse().getContentAsString();
         return JsonPath.parse(responseContent).read("$.id", Long.class);
     }
+
+    public List<GroupLeaderboardDTO> joinTournament(MockMvc mockMvc, Long tournamentId, Long userId) throws Exception {
+        // Define the endpoint URL
+        String joinTournamentUrl = tournamentEndpoint + tournamentId + "/" + joinTournamentEndpoint +  "?userId=" + userId;
+
+        // Perform the POST request
+        MvcResult result = mockMvc.perform(post(joinTournamentUrl)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()) // Ensure the response status is 200 OK
+                .andReturn();
+
+        // Parse and return the response as a list of GroupLeaderboardDTO objects
+        String responseContent = result.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(responseContent,
+                new TypeReference<List<GroupLeaderboardDTO>>() {});
+    }
+
 }

@@ -1,15 +1,23 @@
+import com.dreamgames.backendengineeringcasestudy.dto.GroupLeaderboardDTO;
+import com.dreamgames.backendengineeringcasestudy.model.User;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
 import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
 import com.dreamgames.backendengineeringcasestudy.util.TestUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Random;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -21,6 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class TournamentControllerTest {
 
+    private final String getUsersEndpoint = "/api/users";
+    private final String UserLevelUpEndpoint = "levelUp";
     private final String getTournamentEndpoint = "/api/tournaments";
     private final String createTournamentEndpoint = "/api/tournaments/create";
     private final String joinTournamentEndpoint = "/enter";
@@ -87,90 +97,62 @@ public class TournamentControllerTest {
     }
 
     @Test
-    void testJoinTournament() throws Exception {
+    void testJoinTournamentWithNoLevel() throws Exception {
+        Long uid = testUtils.createUser(mockMvc, "noLevelTestUser");
+        Long tid = testUtils.createTournament(mockMvc, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "noLevelTestTournament");
+        mockMvc.perform(post("/api/tournaments/" + tid + "/enter?userId=" + uid)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden()) // Check for 403 status
+                .andExpect(jsonPath("$.error").value("User must be level 20 or above to join a tournament. User is currently level 1")); // Check error message
+
+        // Add 1 level, try again
+        mockMvc.perform(patch(getUsersEndpoint + "/" + uid + "/" + UserLevelUpEndpoint))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(uid))
+                .andExpect(jsonPath("$.username").value("noLevelTestUser"))
+                .andExpect(jsonPath("$.level").value(2));
+
+        mockMvc.perform(post("/api/tournaments/" + tid + "/enter?userId=" + uid)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden()) // Check for 403 status
+                .andExpect(jsonPath("$.error").value("User must be level 20 or above to join a tournament. User is currently level 2")); // Check error message
+
 
     }
-//    @Test
-//    void testCreateAndFetchTournament() throws Exception {
-//        // 1. Create a tournament using POST
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-//        String startTime = LocalDateTime.now().plusDays(1).format(formatter);
-//        String endTime = LocalDateTime.now().plusDays(2).format(formatter);
-//        String description = "Integration Test Tournament";
-//        // NOTE: datetime supplied is of the format :  2024-12-08T17:09:38.3407076
-//        // while the datetime gotten is of the format: 2024-12-08T17:09:38
-//        // Not sure why these match, they don't match if .format is not applied.
-//
-//
-//
-//        // Extract the created tournament ID
-//        String responseContent = createResult.getResponse().getContentAsString();
-//        Long tournamentId = JsonPath.parse(responseContent).read("$.id", Long.class);
-//
-//        // 2. Fetch the tournament by ID using GET
-//        mockMvc.perform(get("/api/tournaments/" + tournamentId))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(tournamentId))
-//                .andExpect(jsonPath("$.startTime").value(startTime))
-//                .andExpect(jsonPath("$.endTime").value(endTime))
-//                .andExpect(jsonPath("$.description").value(description));
-//
-//        // 3. Verify data in the database directly
-//        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
-//        Assertions.assertEquals(description, tournament.getDescription());
-//        Assertions.assertEquals(LocalDateTime.parse(startTime), tournament.getStartTime());
-//        Assertions.assertEquals(LocalDateTime.parse(endTime), tournament.getEndTime());
-//
-//        // 4. Delete the tournament using the repository, because there are no endpoints for tournament deletion
-//        tournamentRepository.deleteById(tournamentId);
-//        Optional<Tournament> tournament1 = tournamentRepository.findById(tournamentId);
-//        Assertions.assertFalse(tournament1.isPresent());
-//    }
+
+    @Test
+    void testJoinTournamentInactive() throws Exception {
+        Long uid = testUtils.createUser(mockMvc, "joinTournamentInactiveTestUser");
+
+        for (int i = 1; i <= 20; i++) {
+            mockMvc.perform(patch(getUsersEndpoint + "/" + uid + "/" + UserLevelUpEndpoint))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(uid))
+                    .andExpect(jsonPath("$.username").value("joinTournamentInactiveTestUser"))
+                    .andExpect(jsonPath("$.level").value(i+1))
+                    .andExpect(jsonPath("$.coins").value(5000+25*i));
+        }
+
+        // Past inactive tournament
+        Long tid1 = testUtils.createTournament(mockMvc, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1), "Past Test Tournament");
+        String url1 = getTournamentEndpoint + "/" + tid1 + "/" + joinTournamentEndpoint +  "?userId=" + uid;
+
+        // Join the tournament with the random user
+        mockMvc.perform(post(url1))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("This tournament is already over"));
 
 
+        // Future inactive tournament
+        Long tid2 = testUtils.createTournament(mockMvc, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), "Past Test Tournament");
+        String url2 = getTournamentEndpoint + "/" + tid2 + "/" + joinTournamentEndpoint +  "?userId=" + uid;
 
-//    @Test
-//    void testGetTournamentById() throws Exception {
-//        Tournament tournament = new Tournament(1L, "Tournament A", true);
-//        Mockito.when(tournamentService.getTournamentById(1L)).thenReturn(tournament);
-//
-//        mockMvc.perform(get("/api/tournaments/1"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(1))
-//                .andExpect(jsonPath("$.name").value("Tournament A"))
-//                .andExpect(jsonPath("$.isActive").value(true));
-//    }
-//
-//    @Test
-//    void testCreateTournament() throws Exception {
-//        Tournament tournament = new Tournament(null, "Tournament A", true);
-//        Tournament createdTournament = new Tournament(1L, "Tournament A", true);
-//        Mockito.when(tournamentService.createTournament(Mockito.any(Tournament.class))).thenReturn(createdTournament);
-//
-//        mockMvc.perform(post("/api/tournaments/create")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"name\":\"Tournament A\",\"isActive\":true}"))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.id").value(1))
-//                .andExpect(jsonPath("$.name").value("Tournament A"))
-//                .andExpect(jsonPath("$.isActive").value(true));
-//    }
-//
-//    @Test
-//    void testEnterTournament() throws Exception {
-//        TournamentParticipant participant = new TournamentParticipant();
-//        TournamentBracket bracket = new TournamentBracket(1L, "Bracket 1");
-//        participant.setTournamentBracket(bracket);
-//
-//        List<GroupLeaderboardDTO> leaderboard = List.of(new GroupLeaderboardDTO("Group 1", 100));
-//        Mockito.when(tournamentService.joinTournament(1L, 1L)).thenReturn(participant);
-//        Mockito.when(tournamentBracketService.getGroupLeaderboardByBracket(bracket)).thenReturn(leaderboard);
-//
-//        mockMvc.perform(post("/api/tournaments/1/enter")
-//                        .param("userId", "1"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().json("[{\"groupName\":\"Group 1\",\"points\":100}]"));
-//    }
+        // Join the tournament with the random user
+        mockMvc.perform(post(url2))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("This tournament is already over"));
+    }
+
 //
 //    @Test
 //    void testGetBracketsWithoutIndex() throws Exception {
