@@ -1,5 +1,6 @@
 package com.dreamgames.backendengineeringcasestudy.controller;
 
+import com.dreamgames.backendengineeringcasestudy.dto.CountryLeaderboardDTO;
 import com.dreamgames.backendengineeringcasestudy.model.Country;
 import com.dreamgames.backendengineeringcasestudy.service.CountryService;
 import org.springframework.web.bind.annotation.*;
@@ -18,4 +19,10 @@ public class CountryController {
     public List<Country> getAllCountries() {
         return countryService.getAllCountries();
     }
+
+    @GetMapping("/{tournamentId}")
+    public List<CountryLeaderboardDTO> getCountryLeaderboard(@PathVariable Long tournamentId) {
+        return countryService.getCountryLeaderboard(tournamentId);
+    }
+
 }

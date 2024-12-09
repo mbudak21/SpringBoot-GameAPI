@@ -1,5 +1,6 @@
 package com.dreamgames.backendengineeringcasestudy.service;
 
+import com.dreamgames.backendengineeringcasestudy.dto.CountryLeaderboardDTO;
 import com.dreamgames.backendengineeringcasestudy.model.Country;
 import com.dreamgames.backendengineeringcasestudy.repository.CountryRepository;
 import org.springframework.stereotype.Service;
@@ -23,5 +24,8 @@ public class CountryService {
     }
     public List<Country> getAllCountries() {
         return countryRepository.findAll();
+    }
+    public List<CountryLeaderboardDTO> getCountryLeaderboard(Long tournamentBracketId) {
+        return countryRepository.getCountryLeaderboard(tournamentBracketId);
     }
 }
