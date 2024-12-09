@@ -144,7 +144,7 @@ public class TournamentControllerTest {
 
         mockMvc.perform(post(url1))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.error").value("This tournament is already over"));
+                .andExpect(jsonPath("$.error").value("This tournament is not active"));
 
 
         // 2. Future inactive tournament
@@ -153,7 +153,7 @@ public class TournamentControllerTest {
 
         mockMvc.perform(post(url2))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.error").value("This tournament is already over"));
+                .andExpect(jsonPath("$.error").value("This tournament is not active"));
     }
 
 
@@ -170,8 +170,10 @@ public class TournamentControllerTest {
         String url = getTournamentEndpoint + "/" + tid + "/" + joinTournamentEndpoint +  "?userId=" + uid;
 
         mockMvc.perform(post(url))
+                .andExpect(status().isOk());
+        mockMvc.perform(post(url))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.error").value("This tournament is already over"));
+                .andExpect(jsonPath("$.error").value("User has an unclaimed tournament reward. Claim the reward to join other tournaments."));
 
     }
 

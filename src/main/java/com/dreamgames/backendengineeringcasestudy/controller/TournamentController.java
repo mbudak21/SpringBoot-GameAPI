@@ -4,6 +4,7 @@ import com.dreamgames.backendengineeringcasestudy.dto.GroupLeaderboardDTO;
 import com.dreamgames.backendengineeringcasestudy.model.Tournament;
 import com.dreamgames.backendengineeringcasestudy.model.TournamentBracket;
 import com.dreamgames.backendengineeringcasestudy.model.TournamentParticipant;
+import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
 import com.dreamgames.backendengineeringcasestudy.service.TournamentBracketService;
 import com.dreamgames.backendengineeringcasestudy.service.TournamentService;
 
@@ -19,10 +20,18 @@ import java.util.List;
 public class TournamentController {
     private final TournamentService tournamentService;
     private final TournamentBracketService tournamentBracketService;
+    private final UserRepository userRepository;
 
-    public TournamentController(TournamentService tournamentService, TournamentBracketService tournamentBracketService) {
+    public TournamentController(TournamentService tournamentService, TournamentBracketService tournamentBracketService, UserRepository userRepository) {
         this.tournamentService = tournamentService;
         this.tournamentBracketService = tournamentBracketService;
+        this.userRepository = userRepository;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createTournament(@Valid @RequestBody Tournament tournament) {
+        Tournament createdTournament = tournamentService.createTournament(tournament);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTournament);
     }
 
     @GetMapping
@@ -30,17 +39,10 @@ public class TournamentController {
         return tournamentService.getAllTournaments(isActive);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
         Tournament tournament = tournamentService.getTournamentById(id);
         return ResponseEntity.ok(tournament);
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<?> createTournament(@Valid @RequestBody Tournament tournament) {
-        Tournament createdTournament = tournamentService.createTournament(tournament);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTournament);
     }
 
     @PostMapping("/{tournamentId}/enter")
@@ -67,19 +69,6 @@ public class TournamentController {
     @GetMapping("/claim-reward")
     public ResponseEntity<?> claimReward(@RequestParam(required = true) Long userId) {
         tournamentService.claimReward(userId);
-        return ResponseEntity.ok("Reward Claimed");
+        return ResponseEntity.ok(userRepository.getReferenceById(userId));
     }
 }
-
-
-
-
-//    @PostMapping("/{tournamentId}/claim-reward")
-//    public ResponseEntity<User> claimReward(
-//            @PathVariable Long tournamentId,
-//            @RequestParam Long userId) {
-//        User updatedUser = tournamentService.claimReward(tournamentId, userId);
-//        return ResponseEntity.ok(updatedUser);
-//    }
-
-
