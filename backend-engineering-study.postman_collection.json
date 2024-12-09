@@ -67,50 +67,30 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get Country Leaderboard By Tournament",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/countries/{{id}}",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"countries",
+										"{{id}}"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
 				{
 					"name": "UserController",
 					"item": [
-						{
-							"name": "Get All Users",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Response contains a list of users\", function () {",
-											"    const response = pm.response.json();",
-											"    pm.expect(response).to.be.an('array');",
-											"    pm.expect(response.length).to.be.greaterThan(0);",
-											"});"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}api/users",
-									"host": [
-										"{{base_url}}api"
-									],
-									"path": [
-										"users"
-									]
-								},
-								"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
-							},
-							"response": []
-						},
 						{
 							"name": "Create User",
 							"event": [
@@ -152,7 +132,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{base_url}}api/users/create?username=JohnDoe24",
+									"raw": "{{base_url}}api/users/create?username=JohnDoe14",
 									"host": [
 										"{{base_url}}api"
 									],
@@ -163,7 +143,7 @@
 									"query": [
 										{
 											"key": "username",
-											"value": "JohnDoe24"
+											"value": "JohnDoe14"
 										}
 									]
 								},
@@ -215,6 +195,44 @@
 										"{{id}}"
 									]
 								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Users",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response contains a list of users\", function () {",
+											"    const response = pm.response.json();",
+											"    pm.expect(response).to.be.an('array');",
+											"    pm.expect(response.length).to.be.greaterThan(0);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/users",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"users"
+									]
+								},
+								"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
 							},
 							"response": []
 						},
@@ -273,14 +291,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{base_url}}api/users/{{id}}/level",
+									"raw": "{{base_url}}api/users/{{id}}/levelUp",
 									"host": [
 										"{{base_url}}api"
 									],
 									"path": [
 										"users",
 										"{{id}}",
-										"level"
+										"levelUp"
 									]
 								},
 								"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
@@ -335,6 +353,40 @@
 				{
 					"name": "TournamentController",
 					"item": [
+						{
+							"name": "Create New Tournament",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"startTime\": \"2000-12-01T10:00:00\",\r\n    \"endTime\": \"2034-12-01T18:00:00\",\r\n    \"description\": \"Winter Championship3\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}api/tournaments/create",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"create"
+									],
+									"query": [
+										{
+											"key": "description",
+											"value": "test",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
 						{
 							"name": "Get All Tournaments",
 							"request": {
@@ -417,46 +469,12 @@
 							"response": []
 						},
 						{
-							"name": "Create New Tournament",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"startTime\": \"2024-12-01T10:00:00\",\r\n    \"endTime\": \"2044-12-01T18:00:00\",\r\n    \"description\": \"Winter Championship3\"\r\n}\r\n",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base_url}}api/tournaments/create",
-									"host": [
-										"{{base_url}}api"
-									],
-									"path": [
-										"tournaments",
-										"create"
-									],
-									"query": [
-										{
-											"key": "description",
-											"value": "test",
-											"disabled": true
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Enter Tournament",
 							"request": {
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}api/tournaments/{{tournament_id}}/enter?userId=2",
+									"raw": "{{base_url}}api/tournaments/{{tournament_id}}/enter?userId=1553",
 									"host": [
 										"{{base_url}}api"
 									],
@@ -468,32 +486,7 @@
 									"query": [
 										{
 											"key": "userId",
-											"value": "2"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get i'th Bracket of Tournament",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_url}}api/tournaments/{{tournament_id}}/brackets?bracket_index=1",
-									"host": [
-										"{{base_url}}api"
-									],
-									"path": [
-										"tournaments",
-										"{{tournament_id}}",
-										"brackets"
-									],
-									"query": [
-										{
-											"key": "bracket_index",
-											"value": "1"
+											"value": "1553"
 										}
 									]
 								}
@@ -518,13 +511,70 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get i'th Bracket of Tournament",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments/{{tournament_id}}/brackets?bracket_index=3",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"{{tournament_id}}",
+										"brackets"
+									],
+									"query": [
+										{
+											"key": "bracket_index",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Claim Tournament Reward",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}api/tournaments/claim-reward?userID=3",
+									"host": [
+										"{{base_url}}api"
+									],
+									"path": [
+										"tournaments",
+										"claim-reward"
+									],
+									"query": [
+										{
+											"key": "userID",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
 						}
 					]
 				}
 			]
 		},
 		{
-			"name": "1000 Users",
+			"name": "1000 Users (Probably doesn't work)",
 			"item": [
 				{
 					"name": "Get All Current Users",
