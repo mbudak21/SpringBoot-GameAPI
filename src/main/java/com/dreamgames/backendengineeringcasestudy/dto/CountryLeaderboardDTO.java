@@ -1,8 +1,8 @@
 package com.dreamgames.backendengineeringcasestudy.dto;
 
 public class CountryLeaderboardDTO {
-    private String countryName;
-    private Long totalTournamentScore;
+    private final String countryName;
+    private final Long totalTournamentScore;
 
     public CountryLeaderboardDTO(String countryName, Long totalTournamentScore) {
         this.countryName = countryName;

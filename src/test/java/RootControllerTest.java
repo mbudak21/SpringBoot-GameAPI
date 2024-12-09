@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RootControllerTest {
     @Autowired
     private MockMvc mockMvc;
-    private String endpoint = "http://localhost:8080";
+    private final String endpoint = "http://localhost:8080";
 
     @Test
     public void testGetStatus() throws Exception {

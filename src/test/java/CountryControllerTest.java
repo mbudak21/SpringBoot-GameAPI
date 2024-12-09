@@ -5,14 +5,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = com.dreamgames.backendengineeringcasestudy.BackendEngineeringCaseStudyApplication.class)
 @AutoConfigureMockMvc
 public class CountryControllerTest {
     @Autowired
     private MockMvc mockMvc;
-    private String endpoint = "http://localhost:8080/api/countries";
+    private final String endpoint = "http://localhost:8080/api/countries";
 
     @Test
     public void testGetCountries() throws Exception {

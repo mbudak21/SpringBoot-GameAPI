@@ -2,7 +2,6 @@ package com.dreamgames.backendengineeringcasestudy.repository;
 
 import com.dreamgames.backendengineeringcasestudy.model.Tournament;
 import com.dreamgames.backendengineeringcasestudy.model.TournamentBracket;
-import com.dreamgames.backendengineeringcasestudy.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

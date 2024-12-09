@@ -1,7 +1,6 @@
 package com.dreamgames.backendengineeringcasestudy.service;
 
 import com.dreamgames.backendengineeringcasestudy.model.Country;
-import com.dreamgames.backendengineeringcasestudy.model.TournamentBracket;
 import com.dreamgames.backendengineeringcasestudy.model.TournamentParticipant;
 import com.dreamgames.backendengineeringcasestudy.model.User;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentBracketRepository;
@@ -13,6 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 

@@ -2,8 +2,6 @@ package com.dreamgames.backendengineeringcasestudy.service;
 
 import com.dreamgames.backendengineeringcasestudy.dto.GroupLeaderboardDTO;
 import com.dreamgames.backendengineeringcasestudy.model.TournamentBracket;
-import com.dreamgames.backendengineeringcasestudy.model.TournamentParticipant;
-import com.dreamgames.backendengineeringcasestudy.model.User;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentBracketRepository;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentParticipantRepository;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
