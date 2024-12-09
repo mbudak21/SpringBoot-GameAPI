@@ -13,20 +13,21 @@ import java.util.List;
 
 @Repository
 public interface TournamentParticipantRepository extends JpaRepository<TournamentParticipant, Long> {
-    @Query(
+    @Query
+    (
             """
             SELECT new com.dreamgames.backendengineeringcasestudy.dto.GroupLeaderboardDTO(
                 u.id, u.username, c.name, tp.team, tp.score
             )
-            FROM 
+            FROM
                 TournamentParticipant tp
-            JOIN 
+            JOIN
                 tp.user u
-            JOIN 
+            JOIN
                 u.country c
-            WHERE 
+            WHERE
                 tp.tournamentBracket.id = :bracketId
-            ORDER BY 
+            ORDER BY
                 tp.team ASC, tp.score DESC
             """
     )
@@ -34,7 +35,8 @@ public interface TournamentParticipantRepository extends JpaRepository<Tournamen
 
     List<TournamentParticipant> findByTournamentBracket(TournamentBracket bracket);
 
-    @Query(
+    @Query
+    (
             """
             SELECT tp
             FROM TournamentParticipant tp
@@ -48,8 +50,28 @@ public interface TournamentParticipantRepository extends JpaRepository<Tournamen
                 SELECT COUNT(participant.id)
                 FROM TournamentParticipant participant
                 WHERE participant.tournamentBracket = tp.tournamentBracket
-              ) < (tp.tournamentBracket.maxTeams * tp.tournamentBracket.participantsPerTeam)
+              ) <= (tp.tournamentBracket.maxTeams * tp.tournamentBracket.participantsPerTeam)
             """
     )
     List<TournamentParticipant> getActiveParticipations(@Param("user") User user); // tournament.isActive() && bracket.notFull()
+
+    @Query
+    (
+            """
+            SELECT CASE WHEN COUNT(tp) > 0 THEN TRUE ELSE FALSE END
+            FROM TournamentParticipant tp
+            WHERE tp.user= :user AND tp.rewardClaimed = FALSE
+            """
+    )
+    Boolean UserHasUnclaimedTournaments(@Param("user") User user);
+
+    @Query
+    (
+        """
+        SELECT tp
+        FROM TournamentParticipant tp
+        WHERE tp.user = :user and tp.rewardClaimed = FALSE
+        """
+    )
+    TournamentParticipant getUnclaimedParticipation(@Param("user") User user);
 }

@@ -13,7 +13,8 @@ import java.util.List;
 @Repository
 public interface TournamentBracketRepository extends JpaRepository<TournamentBracket, Long> {
 
-    @Query(
+    @Query
+    (
             """
             SELECT 
                 tb
@@ -33,7 +34,8 @@ public interface TournamentBracketRepository extends JpaRepository<TournamentBra
 
     List<TournamentBracket> findByTournamentId(Long tournamentId);
 
-    @Query(
+    @Query
+    (
             """
             SELECT CASE WHEN COUNT(tp.id) >= (tb.maxTeams * tb.participantsPerTeam) THEN true ELSE false END
             FROM TournamentParticipant tp
@@ -43,7 +45,8 @@ public interface TournamentBracketRepository extends JpaRepository<TournamentBra
     )
     Boolean isBracketFull(@Param("bracketID") Long bracketID);
 
-    @Query(
+    @Query
+    (
             """
             SELECT CASE WHEN
                 (t.startTime <= CURRENT_TIMESTAMP AND t.endTime > CURRENT_TIMESTAMP)
@@ -59,7 +62,8 @@ public interface TournamentBracketRepository extends JpaRepository<TournamentBra
     )
     Boolean isBracketBeingPlayed(@Param("bracketID") Long bracketID);
 
-    @Query(
+    @Query
+    (
             """
             SELECT CASE WHEN COUNT(tp.id) > 0 THEN true ELSE false END
             FROM TournamentParticipant tp
@@ -68,4 +72,14 @@ public interface TournamentBracketRepository extends JpaRepository<TournamentBra
             """
     )
     Boolean isUserInBracket(@Param("bracketID") Long bracketID, @Param("userID") Long userID);
+
+
+//    @Query
+//    (
+//        """
+//
+//        """
+//    )
+//    Short getRank(TournamentBracket tournamentBracket, User user);
+
 }

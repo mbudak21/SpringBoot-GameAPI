@@ -4,10 +4,12 @@ import com.dreamgames.backendengineeringcasestudy.model.Country;
 import com.dreamgames.backendengineeringcasestudy.model.TournamentBracket;
 import com.dreamgames.backendengineeringcasestudy.model.TournamentParticipant;
 import com.dreamgames.backendengineeringcasestudy.model.User;
+import com.dreamgames.backendengineeringcasestudy.repository.TournamentBracketRepository;
 import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,27 +19,23 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private static final int DEFAULT_COINS = 5000;
-    private static final int DEFAULT_LEVEL = 1;
-    private static final int LEVEL_UP_BONUS = 25;
+    public static final int DEFAULT_COINS = 5000;
+    public static final int DEFAULT_LEVEL = 1;
+    public static final int LEVEL_UP_BONUS = 25;
 
     private final UserRepository userRepository;
     private final CountryService countryService;
     private final TournamentService tournamentService;
-    private final TournamentBracketService tournamentBracketService;
     private final Logger logger;
+    private final TournamentBracketRepository tournamentBracketRepository;
 
 
-    public UserService(UserRepository userRepository, CountryService countryService, TournamentBracketService tournamentBracketService, TournamentService tournamentService) {
+    public UserService(UserRepository userRepository, CountryService countryService, @Lazy TournamentService tournamentService, TournamentBracketRepository tournamentBracketRepository) {
         this.userRepository = userRepository;
         this.countryService = countryService;
         this.tournamentService = tournamentService;
-        this.tournamentBracketService = tournamentBracketService;
-        this.logger = getLogger();
-    }
-
-    private static Logger getLogger() {
-        return LoggerFactory.getLogger(Logger.class);
+        this.logger = LoggerFactory.getLogger(Logger.class);
+        this.tournamentBracketRepository = tournamentBracketRepository;
     }
 
     @Transactional
@@ -73,9 +71,12 @@ public class UserService {
         user.setCoins(user.getCoins() + LEVEL_UP_BONUS);
 
         // Get all the tournament brackets the user is a participant of
+
         List<TournamentParticipant> activeParticipations = tournamentService.getActiveParticipations(user.getId());
         for (TournamentParticipant participation : activeParticipations) {
-            participation.setScore(participation.getScore() + 1);
+            if (tournamentBracketRepository.isBracketBeingPlayed(participation.getTournamentBracket().getId())){
+                participation.setScore(participation.getScore() + 1);
+            }
         }
         return userRepository.save(user);
     }
@@ -87,7 +88,8 @@ public class UserService {
 
     @Transactional
     public User getUserById(Long userId) {
-        return userRepository.getReferenceById(userId);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     public void deleteUser(Long id) {

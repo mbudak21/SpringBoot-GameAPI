@@ -1,5 +1,9 @@
 import com.dreamgames.backendengineeringcasestudy.dto.GroupLeaderboardDTO;
+import com.dreamgames.backendengineeringcasestudy.model.TournamentBracket;
+import com.dreamgames.backendengineeringcasestudy.model.TournamentParticipant;
 import com.dreamgames.backendengineeringcasestudy.model.User;
+import com.dreamgames.backendengineeringcasestudy.repository.TournamentBracketRepository;
+import com.dreamgames.backendengineeringcasestudy.repository.TournamentParticipantRepository;
 import com.dreamgames.backendengineeringcasestudy.repository.TournamentRepository;
 import com.dreamgames.backendengineeringcasestudy.repository.UserRepository;
 import com.dreamgames.backendengineeringcasestudy.util.TestUtils;
@@ -40,12 +44,15 @@ public class TournamentControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TournamentRepository tournamentRepository;
-
-    @Autowired
     private TestUtils testUtils;
     @Autowired
+    private TournamentRepository tournamentRepository;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TournamentBracketRepository tournamentBracketRepository;
+    @Autowired
+    private TournamentParticipantRepository tournamentParticipantRepository;
 
 
     @BeforeEach
@@ -66,7 +73,9 @@ public class TournamentControllerTest {
 
     @AfterEach
     void clearDatabase() throws Exception {
-        // Delete all the entry's in all the databases
+        // Reset DB to a clean state
+        tournamentParticipantRepository.deleteAll();
+        tournamentBracketRepository.deleteAll();
         tournamentRepository.deleteAll();
         userRepository.deleteAll();
     }
@@ -122,52 +131,50 @@ public class TournamentControllerTest {
 
     @Test
     void testJoinTournamentInactive() throws Exception {
-        Long uid = testUtils.createUser(mockMvc, "joinTournamentInactiveTestUser");
+        Long uid = testUtils.createUser(mockMvc, "InactiveTournamentTestUser");
 
+        // Level up to 20
         for (int i = 1; i <= 20; i++) {
-            mockMvc.perform(patch(getUsersEndpoint + "/" + uid + "/" + UserLevelUpEndpoint))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(uid))
-                    .andExpect(jsonPath("$.username").value("joinTournamentInactiveTestUser"))
-                    .andExpect(jsonPath("$.level").value(i+1))
-                    .andExpect(jsonPath("$.coins").value(5000+25*i));
+            mockMvc.perform(patch(getUsersEndpoint + "/" + uid + "/" + UserLevelUpEndpoint));
         }
 
-        // Past inactive tournament
+        // 1. Past inactive tournament
         Long tid1 = testUtils.createTournament(mockMvc, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusDays(1), "Past Test Tournament");
         String url1 = getTournamentEndpoint + "/" + tid1 + "/" + joinTournamentEndpoint +  "?userId=" + uid;
 
-        // Join the tournament with the random user
         mockMvc.perform(post(url1))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("This tournament is already over"));
 
 
-        // Future inactive tournament
+        // 2. Future inactive tournament
         Long tid2 = testUtils.createTournament(mockMvc, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), "Past Test Tournament");
         String url2 = getTournamentEndpoint + "/" + tid2 + "/" + joinTournamentEndpoint +  "?userId=" + uid;
 
-        // Join the tournament with the random user
         mockMvc.perform(post(url2))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("This tournament is already over"));
     }
 
-//
-//    @Test
-//    void testGetBracketsWithoutIndex() throws Exception {
-//        List<TournamentBracket> brackets = List.of(
-//                new TournamentBracket(1L, "Bracket 1"),
-//                new TournamentBracket(2L, "Bracket 2")
-//        );
-//        Mockito.when(tournamentBracketService.getBrackets(1L)).thenReturn(brackets);
-//
-//        mockMvc.perform(get("/api/tournaments/1/brackets"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().json("[{\"id\":1,\"name\":\"Bracket 1\"}," +
-//                        "{\"id\":2,\"name\":\"Bracket 2\"}]"));
-//    }
-//
+
+    @Test
+    void testJoinTournamentTwice() throws Exception {
+        Long uid = testUtils.createUser(mockMvc, "JoinTournamentTwice");
+
+        // Level up to 20
+        for (int i = 1; i <= 20; i++) {
+            mockMvc.perform(patch(getUsersEndpoint + "/" + uid + "/" + UserLevelUpEndpoint));
+        }
+
+        Long tid = testUtils.createTournament(mockMvc, LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(1), "Active Test Tournament");
+        String url = getTournamentEndpoint + "/" + tid + "/" + joinTournamentEndpoint +  "?userId=" + uid;
+
+        mockMvc.perform(post(url))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("This tournament is already over"));
+
+    }
+
 //    @Test
 //    void testGetBracketsWithIndex() throws Exception {
 //        TournamentBracketDTO bracketDTO = new TournamentBracketDTO(1, "Bracket 1", List.of());

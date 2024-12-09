@@ -63,6 +63,12 @@ public class TournamentController {
             return ResponseEntity.ok(tournamentService.getTournamentBracketDTO(tournamentId, bracket_index));
         }
     }
+
+    @GetMapping("/claim-reward")
+    public ResponseEntity<?> claimReward(@RequestParam(required = true) Long userId) {
+        tournamentService.claimReward(userId);
+        return ResponseEntity.ok("Reward Claimed");
+    }
 }
 
 

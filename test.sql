@@ -14,16 +14,17 @@ INSERT INTO users (username, country_code) VALUES
 ('luc', 'FRA'),
 ('karl', 'GER');
 
+UPDATE users
+SET level = 20;
+
+
+
+
 INSERT INTO tournaments (tournaments.start_time, tournaments.end_time, tournaments.description) VALUES
 ('2000-11-30 10:00:00', '2000-12-01 18:00:00', 'cool tournament1'),
 ('2024-11-29 00:00:00', '2024-11-29 20:00:00', 'cool active tournament'),
 ('2024-11-29 00:00:00', '2029-11-29 20:00:00', 'always active tournament');
 
-INSERT INTO tournament_bracket (tournament_id) VALUES
-(1),
-(2),
-(2),
-(3);
 
 INSERT INTO tournament_participants (tournament_bracket_id, user_id, team) VALUES
 (1, 1, 0),
