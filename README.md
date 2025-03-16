@@ -1,4 +1,4 @@
-# Backend Engineering Case Study [![Unit Tests](https://github.com/mbudak21/backend-engineering-case-study/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mbudak21/backend-engineering-case-study/actions/workflows/docker-image.yml)
+# A Rudimentary SpringBoot API For Tournament Based Multiplayer [![Unit Tests](https://github.com/mbudak21/backend-engineering-case-study/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mbudak21/backend-engineering-case-study/actions/workflows/docker-image.yml)
 
 
 
